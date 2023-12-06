@@ -1,12 +1,14 @@
 Transport for London Santander Cycles Data Pipeline
 ===================================================
-In partnership with Santander, Transport for London (TfL) operate a public cycle hire scheme in London. In 2018 there are over 11,000 bikes located across 700 docking stations. TfL make available a [unified API](https://tfl.gov.uk/info-for/open-data-users/unified-api) to facilitate the open sharing of data for many modes of transportation, including the bike journey data. They have also made available [a bucket](https://cycling.data.tfl.gov.uk/) containing historical data detailing each of the journeys undertaken since 2015.
+Transport for London (TfL) operate a public cycle hire scheme in London. In 2018 there are over 11,000 bikes located across 700 docking stations. TfL make available a [unified API](https://tfl.gov.uk/info-for/open-data-users/unified-api) to facilitate the open sharing of data for many modes of transportation, including the bike journey data. They have also made available [a bucket](https://cycling.data.tfl.gov.uk/) containing historical data detailing each of the journeys undertaken since 2015.
 
-This repository contains a batch processing pipeline that uses Google Cloud Platform (GCP) to extract the TfL bike data from multipole sources and combine it into a single database for analytics.
+This repository contains a batch processing pipeline that uses Google Cloud Platform (GCP) to extract the TfL bike data, along with London weather, temperature, and air quality data from multiple sources and combine it into a single database for analytics.
 The primary dataset contains details for each journey, including start time/location and end time/location. 
 The pipeline also intergrates cycle data with [weather data from the Met Office](https://catalogue.ceda.ac.uk/uuid/4dc8450d889a491ebb20e724debe2dfb) and [London Air Quality Data from TfL](https://www.londonair.org.uk/LondonAir/API/).
 
-Weather observations (rainfall, maximum temperature and minimum temperature) and air quality (PM2.5) are taken as for the entire city.
+Weather observations (rainfall, maximum temperature and minimum temperature) and air quality (PM2.5) are taken as for the entire city. Grid location used for weather and air quality is taken as TQ 30000 80000, which roughly correlates to the AQ monitoring site of "Waterloo Place (The Crown Estate) - Roadside monitoring", which has been in operation since 21 Dec 2020.
+
+Data range is taken as from 21 Dec 2020 until 02 Jan 2023.
 
 # Overview of the pipeline
 
@@ -24,6 +26,8 @@ The technologies in the diagram are also listed below. The pipeline could have b
 ## Weather & Air Quality data
 
 London wide temperatures, rainfall, and Air Quality data is collected for hourly averages. Due to the small location, low ride distances, and short duration of the majority of ride hires, it can be expected that there would not be significant differences between the start and end of trips, or across different ride hubs.
+
+
 
 # Challanges & Limitations
 
