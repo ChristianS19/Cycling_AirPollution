@@ -21,7 +21,7 @@ BIGQUERY_DATASET = environ.get("BIGQUERY_DATASET", "bikes_data_warehouse")
 AIRFLOW_HOME = environ.get("AIRFLOW_HOME", "/opt/airflow/")
 
 
-def get_start_date_from_time(execution_date):
+def get_start_date_data_range(execution_date):
     """
     Gets the start date of the extracted data range. 
 
@@ -31,17 +31,7 @@ def get_start_date_from_time(execution_date):
     :return: Date in "YYYYMM" format.
     """
 
-    # Some weeks have +1 or -1 days, so adjust for this
-    if execution_date.date() == date(2017, 8, 22):
-        days = 7
-
-    elif execution_date.date() == date(2017, 8,  1):
-        days = 5
-
-    else:
-        days = 6
-
-    return (execution_date - timedelta(days=days)).strftime("%Y%m")
+    return (execution_date - timedelta(days=6)).strftime("%Y%m")
 
 
 def get_file_names_from_time(execution_date):
@@ -60,7 +50,7 @@ def get_file_names_from_time(execution_date):
     :return: The formatted file name for the airflow run's time period as a string and the dataset start date in "YYYYMM" format.
     """
     # 2020 IDs start at 195 - this is added to the number of weeks since the first data chunk
-    dataset_id = 195 + ((execution_date.date() - date(2020, 1, 1)).days // 7)
+    dataset_id = 195 + ((execution_date.date() - date(2020, 12, 21)).days // 7)
 
     # Two weeks in a row have the same ID, so increase by one after this point
     if execution_date.date() >= date(2021, 1, 5):
@@ -180,7 +170,7 @@ with DAG(
     catchup = True,                         # Will catchup on any intervals missed
     max_active_runs = 3,                    # Allows for 3 instances to run concurrently
     tags = ["tfl_digest", "bike_usage"],    # Descriptive tags
-    start_date = datetime(2020, 1, 1, 0),   # DAG start date, Wed 01 Jan 2020 at Midnight
+    start_date = datetime(2020, 12, 21, 0), # DAG start date, Wed 01 Jan 2020 at Midnight
     end_date = datetime(2023, 1, 2, 0),     # DAG end date, Mon 02 Jan 2023 at Midnight
     default_args = {
         "owner": "airflow",                 # Owner of DAG for permisions and access
@@ -199,7 +189,7 @@ with DAG(
     # Generate the start date to save the output to the correct GCS folder
     get_start_date = PythonOperator(
         task_id = "get_start_date",
-        python_callable = get_start_date_from_time
+        python_callable = get_start_date_data_range
     )
 
     data_date = "{{ ti.xcom_pull(task_ids='get_start_date') }}"             # Airflow Task Interface {{}}
@@ -272,7 +262,7 @@ with DAG(
     catchup = False,                            # Will not check for missed intervals
     max_active_runs = 1,                        # Will run one concurrently
     tags = ["tfl_digest", "bike_locations"],    # Descriptive tags
-    start_date = datetime(20120, 1, 1),         # DAG start date. Wed 01 Jan 
+    start_date = datetime(2020, 12, 21),        # DAG start date. Wed 01 Jan, 2020 
     default_args = {
         "owner": "airflow",                     # Owner of DAG for permisions and access
         "depends_on_past": True,                # Current DAG run reliant on past run
