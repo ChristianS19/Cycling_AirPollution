@@ -166,11 +166,11 @@ def format_to_parquet(csv_file_dir, csv_file_name, column_types=None):
 # Bike Data ingestion DAG
 with DAG(
     dag_id = "ingest_bike_usage",           # DAG id name
-    schedule_interval = "0 23 * * 3",       # Every week on Wednesday(3), 11pm
+    schedule_interval = "0 23 * * 3",       # Get previous weeks data on Wednesdays at 11pm
     catchup = True,                         # Will catchup on any intervals missed
     max_active_runs = 3,                    # Allows for 3 instances to run concurrently
     tags = ["tfl_digest", "bike_usage"],    # Descriptive tags
-    start_date = datetime(2020, 12, 21, 0), # DAG start date, Wed 01 Jan 2020 at Midnight
+    start_date = datetime(2020, 12, 21, 0), # DAG start date. Mon 21 Dec 2020 at Midnight
     end_date = datetime(2023, 1, 2, 0),     # DAG end date, Mon 02 Jan 2023 at Midnight
     default_args = {
         "owner": "airflow",                 # Owner of DAG for permisions and access
@@ -258,11 +258,11 @@ with DAG(
 
 with DAG(
     dag_id = "ingest_bike_locations",           # DAG ID name
-    schedule_interval = "0 0 1 * *",            # Runs 1st day of month, midnight, any day or month
+    schedule_interval = "0 0 3 * *",            # Runs 3rd day of month, midnight, any day or month
     catchup = False,                            # Will not check for missed intervals
     max_active_runs = 1,                        # Will run one concurrently
     tags = ["tfl_digest", "bike_locations"],    # Descriptive tags
-    start_date = datetime(2020, 12, 21),        # DAG start date. Wed 01 Jan, 2020 
+    start_date = datetime(2020, 12, 21),        # DAG start date. Mon 21 Dec 2020 
     default_args = {
         "owner": "airflow",                     # Owner of DAG for permisions and access
         "depends_on_past": True,                # Current DAG run reliant on past run
